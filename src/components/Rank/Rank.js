@@ -12,7 +12,7 @@ const Rank = ({ name, entries, title }) => {
         <br />
         {title && (
           <div>
-            Your given image contains a{" "}
+            Your given image contains{" "}
             <div
               style={{
                 display: "inline",

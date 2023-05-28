@@ -30,6 +30,8 @@ const Signin = ({ onRouteChange, loadUser }) => {
         loadUser(user);
         onRouteChange("home");
         toast.success("Sign-in successful");
+      } else if (response.ok && !user.id) {
+        toast.error("User not found. Please register first.");
       } else {
         toast.error("Invalid email or password");
       }
