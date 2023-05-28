@@ -30,18 +30,15 @@ const Register = ({ onRouteChange, loadUser }) => {
     }
 
     try {
-      const response = await fetch(
-        "https://recognition-ml-apparel-server.vercel.app/register",
-        {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: name,
-            email: email,
-            password: password,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:3000/register", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          password: password,
+        }),
+      });
 
       const user = await response.json();
 

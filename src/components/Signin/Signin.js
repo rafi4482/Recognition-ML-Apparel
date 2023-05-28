@@ -15,17 +15,14 @@ const Signin = ({ onRouteChange, loadUser }) => {
 
   const onSubmitSignIn = async () => {
     try {
-      const response = await fetch(
-        "https://recognition-ml-apparel-server.vercel.app/signin",
-        {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: signInEmail,
-            password: signInPassword,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:3000/signin", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: signInEmail,
+          password: signInPassword,
+        }),
+      });
 
       const user = await response.json();
 

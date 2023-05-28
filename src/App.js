@@ -82,7 +82,7 @@ const App = () => {
           response.outputs[0].data.regions[0].data.concepts[0].name
         );
         if (response) {
-          fetch("https://recognition-ml-apparel-server.vercel.app/image", {
+          fetch("http://localhost:3000/image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
