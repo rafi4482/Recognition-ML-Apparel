@@ -18,18 +18,18 @@ const app = new Clarifai.App({
 });
 
 const App = () => {
-  const [input, setInput] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [input, setInput] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [box, setBox] = useState({});
-  const [title, setTitle] = useState("")
-  const [route, setRoute] = useState('signin');
+  const [title, setTitle] = useState("");
+  const [route, setRoute] = useState("signin");
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [user, setUser] = useState({
-    id: '',
-    name: '',
-    email: '',
+    id: "",
+    name: "",
+    email: "",
     entries: 0,
-    joined: ''
+    joined: "",
   });
 
   useEffect(() => {
@@ -42,20 +42,21 @@ const App = () => {
       name: data.name,
       email: data.email,
       entries: data.entries,
-      joined: data.joined
+      joined: data.joined,
     });
   };
 
   const calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputimage');
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
     return {
       leftCol: clarifaiFace.left_col * width,
       topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
     };
   };
 
@@ -67,65 +68,68 @@ const App = () => {
     setInput(event.target.value);
   };
 
-  const onTitle=(apparel)=>{
-    setTitle(apparel)
-  }
+  const onTitle = (apparel) => {
+    setTitle(apparel);
+  };
 
   const onButtonSubmit = () => {
     setImageUrl(input);
     app.models
-      .predict('apparel-detection', input)
-      .then(response => {
-        console.log('hi', response.outputs[0].data.regions[0].data.concepts[0].name)
+      .predict("apparel-detection", input)
+      .then((response) => {
+        console.log(
+          "hi",
+          response.outputs[0].data.regions[0].data.concepts[0].name
+        );
         if (response) {
-          fetch('http://localhost:3000/image', {
-            method: 'put',
-            headers: { 'Content-Type': 'application/json' },
+          fetch("https://recognition-ml-apparel-server.vercel.app/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              id: user.id
-            })
+              id: user.id,
+            }),
           })
-            .then(response => response.json())
-            .then(count => {
-              setUser(prevUser => ({ ...prevUser, entries: count }));
+            .then((response) => response.json())
+            .then((count) => {
+              setUser((prevUser) => ({ ...prevUser, entries: count }));
             });
         }
         displayFaceBox(calculateFaceLocation(response));
-        onTitle(response.outputs[0].data.regions[0].data.concepts[0].name)
+        onTitle(response.outputs[0].data.regions[0].data.concepts[0].name);
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   };
 
   const onRouteChange = (route) => {
-if (route === 'signout') {
-setIsSignedIn(false);
-} else if (route === 'home') {
-setIsSignedIn(true);
-}
-setRoute(route);
-};
+    if (route === "signout") {
+      setIsSignedIn(false);
+    } else if (route === "home") {
+      setIsSignedIn(true);
+    }
+    setRoute(route);
+  };
 
-return (
-<div className="App">
-<ParticlesBg type="cobweb" bg={true} />
-<Navigation isSignedIn={isSignedIn} onRouteChange={onRouteChange} />
-{route === 'home' ? (
-<div>
-<Logo />
-<Rank name={user.name} entries={user.entries} title={title}/>
-<ImageLinkForm
-         onInputChange={onInputChange}
-         onButtonSubmit={onButtonSubmit}
-       />
-<FaceRecognition box={box} imageUrl={imageUrl} />
-</div>
-) : route === 'signin' ? (
-<Signin loadUser={loadUser} onRouteChange={onRouteChange} />
-) : (
-<Register loadUser={loadUser} onRouteChange={onRouteChange} />
-)}
-</div>
-);
+  return (
+    <div className="App">
+      <ParticlesBg type="cobweb" bg={true} />
+      <Navigation isSignedIn={isSignedIn} onRouteChange={onRouteChange} />
+      {route === "home" ? (
+        <div>
+          <Logo />
+          <Rank name={user.name} entries={user.entries} title={title} />
+          <ImageLinkForm
+            onInputChange={onInputChange}
+            onButtonSubmit={onButtonSubmit}
+          />
+          <FaceRecognition box={box} imageUrl={imageUrl} />
+        </div>
+      ) : route === "signin" ? (
+        <Signin loadUser={loadUser} onRouteChange={onRouteChange} />
+      ) : (
+        <Register loadUser={loadUser} onRouteChange={onRouteChange} />
+      )}
+    </div>
+  );
 };
 
 export default App;
