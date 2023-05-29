@@ -86,7 +86,7 @@ class App extends Component {
       .then((response) => {
         console.log("hi", response);
         if (response) {
-          fetch("http://recognition-ml-apparel-server-7qpz.vercel.app//image", {
+          fetch("https://recognition-ml-apparel-server.onrender.com/image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

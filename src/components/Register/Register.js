@@ -31,7 +31,7 @@ const Register = ({ onRouteChange, loadUser }) => {
 
     try {
       const response = await fetch(
-        "http://recognition-ml-apparel-server-7qpz.vercel.app//register",
+        "https://recognition-ml-apparel-server.onrender.com/register",
         {
           method: "post",
           headers: { "Content-Type": "application/json" },
