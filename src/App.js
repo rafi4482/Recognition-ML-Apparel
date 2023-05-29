@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Component } from "react";
 import { Particles } from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import { useCallback } from "react";
@@ -17,36 +17,40 @@ const app = new Clarifai.App({
   apiKey: "0e63fdc15bbc4691b4554219ec3e4e53",
 });
 
-const App = () => {
-  const [input, setInput] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [box, setBox] = useState({});
-  const [title, setTitle] = useState("");
-  const [route, setRoute] = useState("signin");
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [user, setUser] = useState({
+const initialState = {
+  input: "",
+  imageUrl: "",
+  box: {},
+  title: "",
+  route: "signin",
+  isSignedIn: false,
+  user: {
     id: "",
     name: "",
     email: "",
     entries: 0,
     joined: "",
-  });
+  },
+};
 
-  useEffect(() => {
-    loadFull();
-  }, []);
-
-  const loadUser = (data) => {
-    setUser({
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      entries: data.entries,
-      joined: data.joined,
+class App extends Component {
+  constructor() {
+    super();
+    this.state = initialState;
+  }
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined,
+      },
     });
   };
 
-  const calculateFaceLocation = (data) => {
+  calculateFaceLocation = (data) => {
     const clarifaiFace =
       data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById("inputimage");
@@ -60,76 +64,91 @@ const App = () => {
     };
   };
 
-  const displayFaceBox = (box) => {
-    setBox(box);
+  displayFaceBox = (box) => {
+    this.setState({ box: box });
   };
 
-  const onInputChange = (event) => {
-    setInput(event.target.value);
+  onInputChange = (event) => {
+    this.setState({ input: event.target.value });
   };
 
-  const onTitle = (apparel) => {
-    setTitle(apparel);
+  onTitle = (apparel) => {
+    console.log(apparel);
+
+    this.setState({ title: apparel });
   };
 
-  const onButtonSubmit = () => {
-    setImageUrl(input);
+  onButtonSubmit = () => {
+    this.setState({ imageUrl: this.state.input });
+
     app.models
-      .predict("apparel-detection", input)
+      .predict("apparel-detection", this.state.input)
       .then((response) => {
-        console.log(
-          "hi",
-          response.outputs[0].data.regions[0].data.concepts[0].name
-        );
+        console.log("hi", response);
         if (response) {
-          fetch("http://localhost:3000/image", {
+          fetch("http://recognition-ml-apparel-server-7qpz.vercel.app//image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              id: user.id,
+              id: this.state.user.id,
             }),
           })
             .then((response) => response.json())
             .then((count) => {
-              setUser((prevUser) => ({ ...prevUser, entries: count }));
+              this.setState(Object.assign(this.state.user, { entries: count }));
             });
         }
-        displayFaceBox(calculateFaceLocation(response));
-        onTitle(response.outputs[0].data.regions[0].data.concepts[0].name);
+        this.displayFaceBox(this.calculateFaceLocation(response));
+        this.onTitle(response.outputs[0].data.regions[0].data.concepts[0].name);
+        console.log(response.outputs[0].data.regions[0].data.concepts[0].name);
       })
       .catch((err) => console.log(err));
   };
 
-  const onRouteChange = (route) => {
+  onRouteChange = (route) => {
     if (route === "signout") {
-      setIsSignedIn(false);
+      this.setState(initialState);
     } else if (route === "home") {
-      setIsSignedIn(true);
+      this.setState({ isSignedIn: true });
     }
-    setRoute(route);
+    this.setState({ route: route });
   };
 
-  return (
-    <div className="App">
-      <ParticlesBg type="cobweb" bg={true} />
-      <Navigation isSignedIn={isSignedIn} onRouteChange={onRouteChange} />
-      {route === "home" ? (
-        <div>
-          <Logo />
-          <Rank name={user.name} entries={user.entries} title={title} />
-          <ImageLinkForm
-            onInputChange={onInputChange}
-            onButtonSubmit={onButtonSubmit}
+  render() {
+    const { isSignedIn, imageUrl, route, box } = this.state;
+    return (
+      <div className="App">
+        <ParticlesBg type="cobweb" bg={true} />
+        <Navigation
+          isSignedIn={isSignedIn}
+          onRouteChange={this.onRouteChange}
+        />
+        {route === "home" ? (
+          <div>
+            <Logo />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+              title={this.state.title}
+            />
+
+            <ImageLinkForm
+              onInputChange={this.onInputChange}
+              onButtonSubmit={this.onButtonSubmit}
+            />
+            <FaceRecognition box={box} imageUrl={imageUrl} />
+          </div>
+        ) : route === "signin" ? (
+          <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+        ) : (
+          <Register
+            loadUser={this.loadUser}
+            onRouteChange={this.onRouteChange}
           />
-          <FaceRecognition box={box} imageUrl={imageUrl} />
-        </div>
-      ) : route === "signin" ? (
-        <Signin loadUser={loadUser} onRouteChange={onRouteChange} />
-      ) : (
-        <Register loadUser={loadUser} onRouteChange={onRouteChange} />
-      )}
-    </div>
-  );
-};
+        )}
+      </div>
+    );
+  }
+}
 
 export default App;
