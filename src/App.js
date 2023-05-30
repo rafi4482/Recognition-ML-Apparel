@@ -1,7 +1,4 @@
 import React, { useState, useEffect, Component } from "react";
-import { Particles } from "react-tsparticles";
-import { loadFull } from "tsparticles";
-import { useCallback } from "react";
 import ParticlesBg from "particles-bg";
 import Clarifai from "clarifai";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
