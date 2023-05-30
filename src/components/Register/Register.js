@@ -31,7 +31,7 @@ const Register = ({ onRouteChange, loadUser }) => {
 
     try {
       const response = await fetch(
-        "https://recognition-ml-apparel-server.onrender.com/register",
+        "http://recognition-ml-apparel-server.onrender.com/register",
         {
           method: "post",
           headers: { "Content-Type": "application/json" },
