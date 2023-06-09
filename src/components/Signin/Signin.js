@@ -16,7 +16,7 @@ const Signin = ({ onRouteChange, loadUser }) => {
   const onSubmitSignIn = async () => {
     try {
       const response = await fetch(
-        "http://recognition-ml-apparel-server-production.up.railway.app/signin",
+        "https://recognition-ml-apparel-server-production.up.railway.app/signin",
         {
           method: "post",
           headers: { "Content-Type": "application/json" },

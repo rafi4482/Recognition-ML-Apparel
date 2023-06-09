@@ -84,7 +84,7 @@ class App extends Component {
         console.log("hi", response);
         if (response) {
           fetch(
-            "http://recognition-ml-apparel-server-production.up.railway.app/image",
+            "https://recognition-ml-apparel-server-production.up.railway.app/image",
             {
               method: "put",
               headers: { "Content-Type": "application/json" },
