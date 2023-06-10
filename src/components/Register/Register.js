@@ -61,7 +61,7 @@ const Register = ({ onRouteChange, loadUser }) => {
   return (
     <>
       <h1 style={{ marginBottom: 110 }}>
-        Unlock Your World with Face Recognition!
+        Unlock Your World with Apparel detection!
       </h1>
       <Toaster></Toaster>
       <article className="mt4 br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
